@@ -25,9 +25,6 @@ window.addEventListener('click', (e) => {
         deleteModal.classList.remove('active');
     }
 });
-/* ============================================
-   AUTH JS — add these to the bottom of script.js
-   ============================================ */
 
 // Toggle password visibility
 function togglePassword(fieldId) {
