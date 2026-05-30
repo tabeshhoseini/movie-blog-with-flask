@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_migrate import Migrate
@@ -27,6 +28,16 @@ class Movie(db.Model):
 
     def __repr__(self):
         return f"movie : {self.title}  id : {self.id} "
+
+
+class User(db.Model, UserMixin):
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.string(80), nullable=False)
+    email = db.Column(db.string(120), nullable=False)
+    password = db.Column(db.string(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
 
 
 @app.route("/")

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Movie Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🎬 My Movie Blog</h1>
+            <a href="{{ url_for('index') }}" class="btn btn-cancel">← Back to Blogs</a>
+        </header>
+
+        <div class="auth-container">
+            <h2 class="auth-title">Welcome Back 👋</h2>
+            <p class="auth-subtitle">Log in to write and manage your movie blogs</p>
+
+            <!-- Flask flashes error messages here -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form action="{{ url_for('login') }}" method="POST" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" required placeholder="Enter your username"
+                        autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" name="password" required placeholder="Enter your password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">👁</button>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-save auth-btn">Login</button>
+                </div>
+            </form>
+
+            <p class="auth-switch">
+                Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+            </p>
+        </div>
+
+        <footer class="credits">
+            <p>Made by <strong>Tabesh Hoseini</strong></p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+
+</html>

@@ -349,3 +349,129 @@ textarea {
         text-align: center;
     }
 }
+
+/* ============================================
+   AUTH PAGES (login.html & register.html)
+   Add these styles to the bottom of style.css
+   ============================================ */
+
+/* Auth Container */
+.auth-container {
+    max-width: 440px;
+    margin: 40px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.auth-title {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.auth-subtitle {
+    color: #7f8c8d;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-form {
+    margin-top: 20px;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 16px;
+    justify-content: center;
+}
+
+/* Password show/hide toggle */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input {
+    padding-right: 45px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #95a5a6;
+    padding: 4px;
+    line-height: 1;
+}
+
+.toggle-password:hover {
+    color: #555;
+}
+
+/* Flash messages from Flask */
+.alert {
+    padding: 12px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
+.alert-error {
+    background-color: #fdecea;
+    color: #c0392b;
+    border-left: 4px solid #e74c3c;
+}
+
+.alert-success {
+    background-color: #eafaf1;
+    color: #1e8449;
+    border-left: 4px solid #27ae60;
+}
+
+.alert-info {
+    background-color: #eaf4fb;
+    color: #1a5276;
+    border-left: 4px solid #3498db;
+}
+
+/* Password match hint text */
+.field-hint {
+    font-size: 13px;
+    margin-top: 5px;
+    min-height: 18px;
+}
+
+.field-hint.match {
+    color: #27ae60;
+}
+
+.field-hint.no-match {
+    color: #e74c3c;
+}
+
+/* Link between login <-> register */
+.auth-switch {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #7f8c8d;
+}
+
+.auth-switch a {
+    color: #3498db;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
