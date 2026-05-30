@@ -1,12 +1,17 @@
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movie_blog.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "postgresql://postgres:8461@localhost:5432/movie_blog"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+migrate = Migrate(app, db)
 
 
 class Movie(db.Model):
@@ -22,10 +27,6 @@ class Movie(db.Model):
 
     def __repr__(self):
         return f"movie : {self.title}  id : {self.id} "
-
-
-with app.app_context():
-    db.create_all()
 
 
 @app.route("/")
@@ -120,4 +121,4 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
