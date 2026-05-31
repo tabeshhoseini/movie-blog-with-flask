@@ -89,14 +89,21 @@ def submit_blog():
 
     review = request.form.get("review")
 
+    user_id = current_user.id
+
     new_movie = Movie(
-        title=title, director=director, year=year, rating=rating, review=review
+        title=title,
+        director=director,
+        year=year,
+        rating=rating,
+        review=review,
+        user_id=user_id,
     )
 
     db.session.add(new_movie)
     db.session.commit()
 
-    return redirect("/")
+    return redirect(url_for("home"))
 
 
 @app.route("/delete/<int:id>", methods=["POST"])
@@ -162,7 +169,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return redirect(url_for("home"))
+    return redirect(url_for("login_page"))
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -197,16 +204,18 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
+
 @app.route("/my_reviews")
 @login_required
 def my_reviews():
     movies = Movie.query.filter_by(user_id=current_user.id).all()
     return render_template("my_reviews.html", movies=movies)
-
-
-@app.route("/logout")
-def logout():
-    pass
 
 
 if __name__ == "__main__":
