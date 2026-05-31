@@ -2,3 +2,33 @@
 __pycache__/app.cpython-312.pyc
 migrations/versions/__pycache__/d6f4abc4e160_add_user_id_to_movies.cpython-312.pyc
 __pycache__/app.cpython-312.pyc
+# Python cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+env/
+.env
+.venv
+
+# Flask
+instance/
+.webassets-cache
+
+# Database migrations (keep the __init__.py if needed)
+migrations/
+!migrations/__init__.py
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
