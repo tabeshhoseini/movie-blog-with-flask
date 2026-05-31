@@ -10,6 +10,7 @@ from flask_login import (
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 
@@ -20,6 +21,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
+bcrypt = Bcrypt(app)
 
 app.config["SECRET_KEY"] = "1385"
 
@@ -38,7 +40,7 @@ class Movie(db.Model):
     rating = db.Column(db.Float)
     date = db.Column(db.DateTime, default=datetime.now)
     review = db.Column(db.Text)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def __repr__(self):
         return f"movie : {self.title}  id : {self.id} "
@@ -165,7 +167,9 @@ def register():
     email = request.form.get("email")
     password = request.form.get("password")
 
-    new_user = User(username=username, email=email, password=password)
+    hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
+
+    new_user = User(username=username, email=email, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
 
@@ -180,7 +184,7 @@ def login():
 
         user = User.query.filter_by(username=username).first()
 
-        if user and user.password == password:
+        if user and bcrypt.check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for("home"))
         else:
