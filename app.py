@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import (
     UserMixin,
     LoginManager,
@@ -29,9 +29,17 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 
-# database tables
-class Movie(db.Model):
-    __tablename__ = "movies"
+# database structure
+
+likes = db.Table(
+    "likes",
+    db.Column("user_id", db.Integer, db.ForeignKey("users.id"), primary_key=True),
+    db.Column("blog_id", db.Integer, db.ForeignKey("blogs.id"), primary_key=True),
+)
+
+
+class Blog(db.Model):
+    __tablename__ = "blogs"
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -41,9 +49,10 @@ class Movie(db.Model):
     date = db.Column(db.DateTime, default=datetime.now)
     review = db.Column(db.Text)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    likes_count = db.Column(db.Integer, default=0)
 
     def __repr__(self):
-        return f"movie : {self.title}  id : {self.id} "
+        return f"blog : {self.title}  id : {self.id} "
 
 
 class User(db.Model, UserMixin):
@@ -54,10 +63,16 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
-    movies = db.relationship("Movie", backref="author", lazy=True)
+    Blogs = db.relationship("Blog", backref="author", lazy=True)
+    liked_movies = db.relationship(
+        "Blog",
+        secondary=likes,
+        backref=db.backref("liked_by", lazy="dynamic"),
+        lazy="dynamic",
+    )
 
 
-# flask routes
+# flask logic
 @app.route("/")
 def index():
     return redirect(url_for("login_page"))
@@ -65,8 +80,9 @@ def index():
 
 @app.route("/home")
 def home():
-    movies = Movie.query.all()
-    return render_template("home.html", movies=movies)
+    blogs = Blog.query.all()
+    liked_ids = {blog.id for blog in current_user.liked_movies}
+    return render_template("home.html", movies=blogs, liked_id=liked_ids)
 
 
 @app.route("/add")
@@ -93,7 +109,7 @@ def submit_blog():
 
     user_id = current_user.id
 
-    new_movie = Movie(
+    new_blog = Blog(
         title=title,
         director=director,
         year=year,
@@ -102,7 +118,7 @@ def submit_blog():
         user_id=user_id,
     )
 
-    db.session.add(new_movie)
+    db.session.add(new_blog)
     db.session.commit()
 
     return redirect(url_for("home"))
@@ -110,8 +126,8 @@ def submit_blog():
 
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete_blog(id):
-    movie = Movie.query.get_or_404(id)
-    db.session.delete(movie)
+    blog = Blog.query.get_or_404(id)
+    db.session.delete(blog)
     db.session.commit()
 
     return redirect(url_for("home"))
@@ -119,28 +135,28 @@ def delete_blog(id):
 
 @app.route("/edit/<int:id>", methods=["GET"])
 def edit_blog(id):
-    movie = Movie.query.get_or_404(id)
-    return render_template("edit.html", movie=movie)
+    blog = Blog.query.get_or_404(id)
+    return render_template("edit.html", movie=blog)
 
 
 @app.route("/update/<int:id>", methods=["POST"])
 def update_blog(id):
-    movie = Movie.query.get_or_404(id)
+    blog = Blog.query.get_or_404(id)
 
-    movie.title = request.form.get("movie_title")
-    movie.director = request.form.get("director")
-
-    try:
-        movie.year = int(request.form.get("year", 0) or 0)
-    except ValueError:
-        movie.year = None
+    blog.title = request.form.get("movie_title")
+    blog.director = request.form.get("director")
 
     try:
-        movie.rating = float(request.form.get("rating", 0) or 0)
+        blog.year = int(request.form.get("year", 0) or 0)
     except ValueError:
-        movie.rating = None
+        blog.year = None
 
-    movie.review = request.form.get("review")
+    try:
+        blog.rating = float(request.form.get("rating", 0) or 0)
+    except ValueError:
+        blog.rating = None
+
+    blog.review = request.form.get("review")
 
     db.session.commit()
 
@@ -152,13 +168,17 @@ def search():
     query = request.args.get("query", "")
 
     if query:
-        movies = Movie.query.filter(
-            (Movie.title.contains(query)) | (Movie.director.contains(query))
+        blogs = Blog.query.filter(
+            (Blog.title.contains(query)) | (Blog.director.contains(query))
         ).all()
     else:
-        movies = []
+        blogs = []
 
-    return render_template("search.html", movies=movies, query=query)
+    liked_ids = {blog.id for blog in current_user.liked_movies}
+
+    return render_template(
+        "search.html", movies=blogs, query=query, liked_ids=liked_ids
+    )
 
 
 @app.route("/register", methods=["POST"])
@@ -218,8 +238,27 @@ def logout():
 @app.route("/my_reviews")
 @login_required
 def my_reviews():
-    movies = Movie.query.filter_by(user_id=current_user.id).all()
-    return render_template("my_reviews.html", movies=movies)
+    blogs = Blog.query.filter_by(user_id=current_user.id).all()
+    liked_ids = {blog.id for blog in current_user.liked_movies}
+    return render_template("my_reviews.html", movies=blogs, liked_ids=liked_ids)
+
+
+@app.route("/like/<int:blog_id>", methods=["POST"])
+@login_required
+def toggle_like(blog_id):
+    blog = Blog.query.get_or_404(blog_id)
+
+    if current_user in blog.liked_by:
+        blog.liked_by.remove(current_user)
+        blog.likes_count -= 1
+        liked = False
+    else:
+        blog.liked_by.append(current_user)
+        blog.likes_count += 1
+        liked = True
+
+    db.session.commit()
+    return jsonify({"liked": liked, "count": blog.likes_count})
 
 
 if __name__ == "__main__":

@@ -1,25 +1,20 @@
-
-
-// Delete Modal functionality (just UI, no data logic)
+// Delete Modal functionality
 const deleteModal = document.getElementById('deleteModal');
 const deleteBlogTitle = document.getElementById('deleteBlogTitle');
 let currentDeleteId = null;
 
-// Open modal - pure UI, no data
 function openDeleteModal(id, title) {
     currentDeleteId = id;
     deleteBlogTitle.textContent = `"${title}"`;
     deleteModal.classList.add('active');
 }
 
-// Close modal - pure UI
 if (document.getElementById('closeDeleteModal')) {
     document.getElementById('closeDeleteModal').addEventListener('click', () => {
         deleteModal.classList.remove('active');
     });
 }
 
-// Close modal when clicking outside - pure UI
 window.addEventListener('click', (e) => {
     if (deleteModal && e.target === deleteModal) {
         deleteModal.classList.remove('active');
@@ -34,7 +29,7 @@ function togglePassword(fieldId) {
     }
 }
 
-// Live password match check on register page
+// Live password match check
 const confirmInput = document.getElementById('confirm_password');
 const passwordInput = document.getElementById('password');
 const hint = document.getElementById('passwordMatchHint');
@@ -58,3 +53,41 @@ function checkPasswordMatch() {
         hint.className = 'field-hint no-match';
     }
 }
+
+// Like button toggle
+function toggleLike(btn, movieId) {
+    btn.disabled = true;
+
+    fetch(`/like/${movieId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+        .then(res => res.json())
+        .then(data => {
+            const icon = btn.querySelector('.like-icon');
+            const count = btn.querySelector('.like-count');
+
+            if (data.liked) {
+                icon.textContent = '❤️';
+                btn.classList.add('liked');
+            } else {
+                icon.textContent = '🤍';
+                btn.classList.remove('liked');
+            }
+
+            count.textContent = data.count;
+
+            btn.classList.remove('like-pop');
+            void btn.offsetWidth;
+            btn.classList.add('like-pop');
+        })
+        .catch(err => console.error('Like error:', err))
+        .finally(() => { btn.disabled = false; });
+}
+
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-like');
+    if (!btn) return;
+    const movieId = btn.dataset.movieId;
+    toggleLike(btn, movieId);
+});

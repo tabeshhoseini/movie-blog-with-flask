@@ -50,6 +50,11 @@
                             onclick="return confirm('Are you sure you want to delete {{ movie.title }}?')">Delete</button>
                     </form>
                     {% endif %}
+                    <button class="btn btn-like {% if movie.id in liked_ids %}liked{% endif %}"
+                        data-movie-id="{{ movie.id }}">
+                        <span class="like-icon">{% if movie.id in liked_ids %}❤️{% else %}🤍{% endif %}</span>
+                        <span class="like-count">{{ movie.likes_count }}</span>
+                    </button>
                 </div>
             </div>
             {% endfor %}
