@@ -27,6 +27,7 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 
 
+# database tables
 class Movie(db.Model):
     __tablename__ = "movies"
 
@@ -37,6 +38,7 @@ class Movie(db.Model):
     rating = db.Column(db.Float)
     date = db.Column(db.DateTime, default=datetime.now)
     review = db.Column(db.Text)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
 
     def __repr__(self):
         return f"movie : {self.title}  id : {self.id} "
@@ -50,12 +52,19 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), nullable=False)
     password = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
+    movies = db.relationship("Movie", backref="author", lazy=True)
 
 
+# flask routes
 @app.route("/")
 def index():
+    return redirect(url_for("login_page"))
+
+
+@app.route("/home")
+def home():
     movies = Movie.query.all()
-    return render_template("index.html", movies=movies)
+    return render_template("home.html", movies=movies)
 
 
 @app.route("/add")
@@ -96,7 +105,7 @@ def delete_blog(id):
     db.session.delete(movie)
     db.session.commit()
 
-    return redirect(url_for("index"))
+    return redirect(url_for("home"))
 
 
 @app.route("/edit/<int:id>", methods=["GET"])
@@ -126,7 +135,7 @@ def update_blog(id):
 
     db.session.commit()
 
-    return redirect(url_for("index"))
+    return redirect(url_for("home"))
 
 
 @app.route("/search")
@@ -153,7 +162,7 @@ def register():
     db.session.add(new_user)
     db.session.commit()
 
-    return redirect(url_for("index"))
+    return redirect(url_for("home"))
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -166,7 +175,7 @@ def login():
 
         if user and user.password == password:
             login_user(user)
-            return redirect(url_for("index"))
+            return redirect(url_for("home"))
         else:
             flash("wrong password or username")
 
@@ -186,6 +195,16 @@ def register_page():
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.route("/my_reviews")
+def my_reviews():
+    return render_template("my_reviews.html")
+
+
+@app.route("/logout")
+def logout():
+    pass
 
 
 if __name__ == "__main__":

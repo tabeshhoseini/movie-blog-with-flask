@@ -475,3 +475,71 @@ textarea {
 .auth-switch a:hover {
     text-decoration: underline;
 }
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.user-greeting {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-right: 4px;
+}
+
+.user-greeting strong {
+    color: #2c3e50;
+}
+
+.btn-my-reviews {
+    background-color: #8e44ad;
+    color: white;
+}
+
+.btn-my-reviews:hover {
+    background-color: #7d3c98;
+}
+
+.btn-logout {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-logout:hover {
+    background-color: #c0392b;
+}
+
+.movie-author {
+    font-size: 13px;
+    color: #95a5a6;
+    margin-bottom: 6px;
+}
+
+.movie-author span {
+    font-weight: 600;
+    color: #7f8c8d;
+}
+
+
+.btn-my-reviews {
+    background-color: #8e44ad;
+    color: white;
+}
+
+.btn-my-reviews:hover {
+    background-color: #7d3c98;
+}
+
+.reviews-count {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.reviews-count strong {
+    color: #2c3e50;
+}
