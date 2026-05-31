@@ -198,8 +198,10 @@ def load_user(user_id):
 
 
 @app.route("/my_reviews")
+@login_required
 def my_reviews():
-    return render_template("my_reviews.html")
+    movies = Movie.query.filter_by(user_id=current_user.id).all()
+    return render_template("my_reviews.html", movies=movies)
 
 
 @app.route("/logout")

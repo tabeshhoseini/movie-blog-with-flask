@@ -14,18 +14,12 @@
         <header>
             <h1>📝 My Reviews</h1>
             <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-                <a href="{{ url_for('index') }}" class="btn btn-cancel">← All Blogs</a>
+                <a href="{{ url_for('home') }}" class="btn btn-cancel">← All Blogs</a>
                 <a href="{{ url_for('add_blog') }}" class="btn btn-add">+ Add New Blog</a>
             </div>
         </header>
 
-        <!-- Search Bar -->
-        <div class="search-section">
-            <form action="{{ url_for('search') }}" method="GET" class="search-form">
-                <input type="text" name="query" placeholder="Search by movie title or director..." class="search-input">
-                <button type="submit" class="btn btn-search">🔍 Search</button>
-            </form>
-        </div>
+
 
         <div class="reviews-count">
             Showing <strong>{{ movies|length }}</strong> review{{ 's' if movies|length != 1 else '' }} by
