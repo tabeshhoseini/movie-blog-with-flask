@@ -11,19 +11,20 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_migrate import Migrate
 from flask_bcrypt import Bcrypt
+import os
 
 app = Flask(__name__)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "postgresql://postgres:8461@localhost:5432/movie_blog"
-)
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
 
 migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 
-app.config["SECRET_KEY"] = "1385"
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
