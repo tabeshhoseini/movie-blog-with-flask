@@ -266,5 +266,8 @@ def toggle_like(blog_id):
     return jsonify({"liked": liked, "count": blog.likes_count})
 
 
+with app.app_context():
+    db.create_all()
+
 if __name__ == "__main__":
     app.run(debug=True)
